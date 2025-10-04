@@ -7,20 +7,20 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-const Page = async ({ params }: { params: { id: string } }) => {
-     const param = await params;
-     if (!param.id) return null;
+const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
+     const { id } = await params;
+     if (!id) return null;
      const user = await currentUser();
      if (!user) return null;
 
-     const userInfo = await fetchUser(param.id);
+     const userInfo = await fetchUser(id);
      if (!userInfo?.onboarded) redirect("/onboarding");
 
      return (
           <section>
                <ProfileHeader
                     accountId={userInfo.id}
-                    authUserId={param.id}
+                    authUserId={id}
                     name={userInfo.name}
                     username={userInfo.username}
                     imgUrl={userInfo.image}
