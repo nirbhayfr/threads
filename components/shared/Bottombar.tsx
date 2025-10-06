@@ -8,8 +8,10 @@ import { sidebarLinks } from "@/constants";
 import { useAuth } from "@clerk/nextjs";
 
 function Bottombar() {
-     const { userId } = useAuth();
+     const auth = useAuth();
      const pathname = usePathname();
+     if (!auth.isLoaded) return null;
+     const id = auth.userId;
 
      return (
           <section className="bottombar">
@@ -20,12 +22,13 @@ function Bottombar() {
                                    link.route.length > 1) ||
                               pathname === link.route;
 
-                         if (link.route === "/profile")
-                              link.route = `${link.route}/${userId}`;
+                         const finalRoute = link.route.startsWith("/profile")
+                              ? `${link.route}/${id}`
+                              : link.route;
 
                          return (
                               <Link
-                                   href={link.route}
+                                   href={finalRoute}
                                    key={link.label}
                                    className={`bottombar_link ${
                                         isActive && "bg-primary-500"

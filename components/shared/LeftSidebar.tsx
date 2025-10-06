@@ -8,8 +8,10 @@ import { SignedIn, SignOutButton, useAuth } from "@clerk/nextjs";
 import { sidebarLinks } from "@/constants";
 
 function LeftSidebar() {
-     const { userId } = useAuth();
+     const auth = useAuth();
      const pathname = usePathname();
+     if (!auth.isLoaded) return null;
+     const id = auth.userId;
 
      return (
           <section className="custom-scrollbar leftsidebar">
@@ -20,12 +22,13 @@ function LeftSidebar() {
                                    link.route.length > 1) ||
                               pathname === link.route;
 
-                         if (link.route === "/profile")
-                              link.route = `${link.route}/${userId}`;
+                         const finalRoute = link.route.startsWith("/profile")
+                              ? `${link.route}/${id}`
+                              : link.route;
 
                          return (
                               <Link
-                                   href={link.route}
+                                   href={finalRoute}
                                    key={link.label}
                                    className={`leftsidebar_link ${
                                         isActive && "bg-primary-500"
